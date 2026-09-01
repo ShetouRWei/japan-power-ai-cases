@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="日本電力公司 AI 案例資料庫">
+  <title>日本電力 AI 案例庫</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="hero">
+    <div class="hero__inner">
+      <p class="eyebrow">JAPAN POWER × AI</p>
+      <h1>日本電力 AI 案例庫</h1>
+      <p class="hero__copy">搜尋、篩選並閱讀日本電力公司的 AI 與數位轉型實務。</p>
+      <div class="stats" aria-label="資料庫統計">
+        <div><strong id="total-count">—</strong><span>案例</span></div>
+        <div><strong id="company-count">—</strong><span>公司／集團</span></div>
+        <div><strong id="result-count">—</strong><span>目前顯示</span></div>
+      </div>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="toolbar" aria-label="搜尋與篩選">
+      <label class="search">
+        <span class="sr-only">搜尋案例</span>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m21 21-4.35-4.35m2.35-5.65a8 8 0 1 1-16 0 8 8 0 0 1 16 0Z"/></svg>
+        <input id="search-input" type="search" placeholder="搜尋公司、技術、成果或關鍵字…" autocomplete="off">
+        <kbd>/</kbd>
+      </label>
+      <div class="filters">
+        <label>公司<select id="company-filter"><option value="">全部公司</option></select></label>
+        <label>成熟度<select id="maturity-filter"><option value="">全部階段</option></select></label>
+        <label>排序<select id="sort-filter"><option value="newest">最新建檔</option><option value="oldest">最早建檔</option><option value="company">公司名稱</option></select></label>
+        <button id="reset-button" class="button" type="button">清除篩選</button>
+      </div>
+    </section>
+
+    <div class="content-grid">
+      <section>
+        <div class="section-heading">
+          <h2>案例一覽</h2>
+          <span id="query-note"></span>
+        </div>
+        <div id="case-list" class="case-list"></div>
+        <div id="empty-state" class="empty" hidden>
+          <h3>找不到相符案例</h3>
+          <p>試著縮短關鍵字或清除部分篩選條件。</p>
+        </div>
+      </section>
+      <aside class="insights">
+        <h2>快速瀏覽</h2>
+        <div id="domain-list" class="chip-list"></div>
+        <hr>
+        <p class="meta">資料來源：<span id="source-name"></span></p>
+        <p class="meta">網站資料更新：<time id="generated-time"></time></p>
+      </aside>
+    </div>
+  </main>
+
+  <dialog id="case-dialog">
+    <div class="dialog-bar">
+      <button id="dialog-close" class="icon-button" type="button" aria-label="關閉">×</button>
+    </div>
+    <article id="case-detail" class="case-detail"></article>
+  </dialog>
+
+  <script src="cases-data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
