@@ -1,5 +1,5 @@
 const library = window.CASE_LIBRARY || { cases: [], generatedAt: "", source: "" };
-const state = { query: "", company: "", taipowerUnit: "", sort: "newest", domain: "" };
+const state = { query: "", company: "", taipowerUnit: "", sort: "newest" };
 const $ = (selector) => document.querySelector(selector);
 
 function escapeHtml(value = "") {
@@ -40,26 +40,18 @@ function markdownToHtml(markdown) {
   closeList(); flushTable(); return html;
 }
 
-function domains(value) {
-  return (value || "").split(/[、，,／/]/).map((item) => item.trim()).filter((item) => item.length > 1 && item.length < 18);
-}
-
 function renderFilters() {
   const companies = library.companyGroups || [...new Set(library.cases.map((item) => item.company).filter(Boolean))];
   $("#company-filter").insertAdjacentHTML("beforeend", companies.map((value) => `<option value="${escapeHtml(value)}">${escapeHtml(value)}</option>`).join(""));
   const taipowerUnits = library.taipowerUnits || [...new Set(library.cases.map((item) => item.taipowerUnit).filter(Boolean))];
   $("#taipower-filter").insertAdjacentHTML("beforeend", taipowerUnits.map((value) => `<option value="${escapeHtml(value)}">${escapeHtml(value)}</option>`).join(""));
-  const counts = {};
-  library.cases.flatMap((item) => domains(item.domain)).forEach((name) => counts[name] = (counts[name] || 0) + 1);
-  const top = Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 12);
-  $("#domain-list").innerHTML = top.map(([name, count]) => `<button class="chip" data-domain="${escapeHtml(name)}">${escapeHtml(name)} · ${count}</button>`).join("");
 }
 
 function filteredCases() {
   const query = state.query.toLocaleLowerCase("zh-Hant");
   const items = library.cases.filter((item) => {
     const haystack = `${item.title} ${item.id} ${item.company} ${item.taipowerUnit} ${item.domain} ${item.maturity} ${item.summary} ${item.markdown}`.toLocaleLowerCase("zh-Hant");
-    return (!query || haystack.includes(query)) && (!state.company || item.company === state.company) && (!state.taipowerUnit || item.taipowerUnit === state.taipowerUnit) && (!state.domain || domains(item.domain).includes(state.domain));
+    return (!query || haystack.includes(query)) && (!state.company || item.company === state.company) && (!state.taipowerUnit || item.taipowerUnit === state.taipowerUnit);
   });
   return items.sort((a, b) => state.sort === "oldest" ? a.number - b.number : state.sort === "company" ? (a.company || "").localeCompare(b.company || "", "zh-Hant") : b.number - a.number);
 }
@@ -67,7 +59,7 @@ function filteredCases() {
 function render() {
   const items = filteredCases();
   $("#result-count").textContent = items.length;
-  $("#query-note").textContent = state.domain ? `領域：${state.domain}` : state.query ? `搜尋：${state.query}` : "";
+  $("#query-note").textContent = state.query ? `搜尋：${state.query}` : "";
   $("#case-list").innerHTML = items.map((item) => `<article class="case-card" tabindex="0" data-number="${item.number}">
     <span class="case-card__number">CASE ${String(item.number).padStart(3, "0")} ${item.id ? `· ${escapeHtml(item.id)}` : ""}</span>
     <h3>${escapeHtml(item.title.replace(/^案例\s*\d+｜?\s*/, ""))}</h3>
@@ -87,16 +79,13 @@ function openCase(number) {
 
 $("#total-count").textContent = library.cases.length;
 $("#company-count").textContent = (library.companyGroups || []).length || new Set(library.cases.map((item) => item.company).filter(Boolean)).size;
-$("#source-name").textContent = library.source;
-$("#generated-time").textContent = library.generatedAt ? new Date(library.generatedAt).toLocaleString("zh-TW") : "—";
 renderFilters(); render();
 
 $("#search-input").addEventListener("input", (event) => { state.query = event.target.value.trim(); render(); });
 $("#company-filter").addEventListener("change", (event) => { state.company = event.target.value; render(); });
 $("#taipower-filter").addEventListener("change", (event) => { state.taipowerUnit = event.target.value; render(); });
 $("#sort-filter").addEventListener("change", (event) => { state.sort = event.target.value; render(); });
-$("#reset-button").addEventListener("click", () => { Object.assign(state, { query: "", company: "", taipowerUnit: "", domain: "" }); $("#search-input").value = ""; $("#company-filter").value = ""; $("#taipower-filter").value = ""; render(); });
-$("#domain-list").addEventListener("click", (event) => { const button = event.target.closest("[data-domain]"); if (button) { state.domain = state.domain === button.dataset.domain ? "" : button.dataset.domain; render(); } });
+$("#reset-button").addEventListener("click", () => { Object.assign(state, { query: "", company: "", taipowerUnit: "" }); $("#search-input").value = ""; $("#company-filter").value = ""; $("#taipower-filter").value = ""; render(); });
 $("#case-list").addEventListener("click", (event) => { const card = event.target.closest("[data-number]"); if (card) openCase(card.dataset.number); });
 $("#case-list").addEventListener("keydown", (event) => { if ((event.key === "Enter" || event.key === " ") && event.target.matches("[data-number]")) openCase(event.target.dataset.number); });
 $("#dialog-close").addEventListener("click", () => $("#case-dialog").close());
