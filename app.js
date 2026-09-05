@@ -79,6 +79,16 @@ function openCase(number) {
 
 $("#total-count").textContent = library.cases.length;
 $("#company-count").textContent = (library.companyGroups || []).length || new Set(library.cases.map((item) => item.company).filter(Boolean)).size;
+$("#site-version").textContent = library.version || "—";
+$("#last-updated").textContent = library.generatedAt ? new Date(library.generatedAt).toLocaleString("zh-TW", {
+  timeZone: "Asia/Taipei",
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+  hour: "2-digit",
+  minute: "2-digit",
+  hour12: false,
+}) : "—";
 renderFilters(); render();
 
 $("#search-input").addEventListener("input", (event) => { state.query = event.target.value.trim(); render(); });

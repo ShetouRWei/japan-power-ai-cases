@@ -6,6 +6,7 @@ const here = dirname(fileURLToPath(import.meta.url));
 const sourcePath = resolve(here, "..", "日本電力公司AI案例庫.md");
 const taipowerMappingPath = resolve(here, "..", "台電8加1系統事業部案例對照.md");
 const outputPath = resolve(here, "cases-data.js");
+const siteVersion = "v1.0";
 const markdown = (await readFile(sourcePath, "utf8")).replace(/\r\n/g, "\n");
 const taipowerMappingMarkdown = (await readFile(taipowerMappingPath, "utf8")).replace(/\r\n/g, "\n");
 
@@ -128,6 +129,7 @@ const cases = sections.map((section) => {
 });
 
 const payload = `window.CASE_LIBRARY = ${JSON.stringify({
+  version: siteVersion,
   generatedAt: new Date().toISOString(),
   source: "日本電力公司AI案例庫.md",
   companyGroups,
