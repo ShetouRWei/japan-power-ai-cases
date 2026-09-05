@@ -18,6 +18,8 @@ button, input, select { font: inherit; }
 .eyebrow { margin: 0 0 8px; color: var(--lime); font-size: .75rem; font-weight: 800; letter-spacing: .18em; }
 h1 { max-width: 720px; margin: 0; font-size: clamp(2.25rem, 6vw, 4.7rem); line-height: .98; letter-spacing: -.055em; }
 .hero__copy { max-width: 680px; margin: 20px 0 32px; color: #d9eee8; font-size: 1.06rem; }
+.hero__copy span { display: block; }
+.hero__copy span + span { margin-top: 8px; font-size: .88rem; color: #b9d5cd; }
 .stats { display: flex; gap: 36px; }
 .stats div { display: flex; align-items: baseline; gap: 8px; }
 .stats strong { font-size: 1.8rem; }
