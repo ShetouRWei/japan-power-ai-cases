@@ -1,5 +1,5 @@
 const library = window.CASE_LIBRARY || { cases: [], generatedAt: "", source: "" };
-const state = { query: "", company: "", maturity: "", sort: "newest", domain: "" };
+const state = { query: "", company: "", taipowerUnit: "", sort: "newest", domain: "" };
 const $ = (selector) => document.querySelector(selector);
 
 function escapeHtml(value = "") {
@@ -40,14 +40,6 @@ function markdownToHtml(markdown) {
   closeList(); flushTable(); return html;
 }
 
-function stageGroup(value) {
-  if (!value) return "未標示";
-  if (/正式|已導入|已運用|規模化/.test(value)) return "正式運用";
-  if (/實證|驗證|試行|評估|研究/.test(value)) return "研究／實證";
-  if (/規劃|構想|開發中/.test(value)) return "規劃／開發";
-  return "其他階段";
-}
-
 function domains(value) {
   return (value || "").split(/[、，,／/]/).map((item) => item.trim()).filter((item) => item.length > 1 && item.length < 18);
 }
@@ -55,8 +47,8 @@ function domains(value) {
 function renderFilters() {
   const companies = library.companyGroups || [...new Set(library.cases.map((item) => item.company).filter(Boolean))];
   $("#company-filter").insertAdjacentHTML("beforeend", companies.map((value) => `<option value="${escapeHtml(value)}">${escapeHtml(value)}</option>`).join(""));
-  const stages = [...new Set(library.cases.map((item) => stageGroup(item.maturity)))];
-  $("#maturity-filter").insertAdjacentHTML("beforeend", stages.map((value) => `<option value="${escapeHtml(value)}">${escapeHtml(value)}</option>`).join(""));
+  const taipowerUnits = library.taipowerUnits || [...new Set(library.cases.map((item) => item.taipowerUnit).filter(Boolean))];
+  $("#taipower-filter").insertAdjacentHTML("beforeend", taipowerUnits.map((value) => `<option value="${escapeHtml(value)}">${escapeHtml(value)}</option>`).join(""));
   const counts = {};
   library.cases.flatMap((item) => domains(item.domain)).forEach((name) => counts[name] = (counts[name] || 0) + 1);
   const top = Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 12);
@@ -66,8 +58,8 @@ function renderFilters() {
 function filteredCases() {
   const query = state.query.toLocaleLowerCase("zh-Hant");
   const items = library.cases.filter((item) => {
-    const haystack = `${item.title} ${item.id} ${item.company} ${item.domain} ${item.maturity} ${item.summary} ${item.markdown}`.toLocaleLowerCase("zh-Hant");
-    return (!query || haystack.includes(query)) && (!state.company || item.company === state.company) && (!state.maturity || stageGroup(item.maturity) === state.maturity) && (!state.domain || domains(item.domain).includes(state.domain));
+    const haystack = `${item.title} ${item.id} ${item.company} ${item.taipowerUnit} ${item.domain} ${item.maturity} ${item.summary} ${item.markdown}`.toLocaleLowerCase("zh-Hant");
+    return (!query || haystack.includes(query)) && (!state.company || item.company === state.company) && (!state.taipowerUnit || item.taipowerUnit === state.taipowerUnit) && (!state.domain || domains(item.domain).includes(state.domain));
   });
   return items.sort((a, b) => state.sort === "oldest" ? a.number - b.number : state.sort === "company" ? (a.company || "").localeCompare(b.company || "", "zh-Hant") : b.number - a.number);
 }
@@ -80,7 +72,7 @@ function render() {
     <span class="case-card__number">CASE ${String(item.number).padStart(3, "0")} ${item.id ? `· ${escapeHtml(item.id)}` : ""}</span>
     <h3>${escapeHtml(item.title.replace(/^案例\s*\d+｜?\s*/, ""))}</h3>
     <p>${escapeHtml(item.summary || "點選查看完整案例內容。")}</p>
-    <div class="card-footer">${item.company ? `<span class="tag">${escapeHtml(item.company)}</span>` : ""}${item.maturity ? `<span class="tag tag--stage">${escapeHtml(stageGroup(item.maturity))}</span>` : ""}</div>
+    <div class="card-footer">${item.company ? `<span class="tag">${escapeHtml(item.company)}</span>` : ""}${item.taipowerUnit ? `<span class="tag tag--stage">${escapeHtml(item.taipowerUnit)}</span>` : ""}</div>
   </article>`).join("");
   $("#empty-state").hidden = items.length > 0;
 }
@@ -101,9 +93,9 @@ renderFilters(); render();
 
 $("#search-input").addEventListener("input", (event) => { state.query = event.target.value.trim(); render(); });
 $("#company-filter").addEventListener("change", (event) => { state.company = event.target.value; render(); });
-$("#maturity-filter").addEventListener("change", (event) => { state.maturity = event.target.value; render(); });
+$("#taipower-filter").addEventListener("change", (event) => { state.taipowerUnit = event.target.value; render(); });
 $("#sort-filter").addEventListener("change", (event) => { state.sort = event.target.value; render(); });
-$("#reset-button").addEventListener("click", () => { Object.assign(state, { query: "", company: "", maturity: "", domain: "" }); $("#search-input").value = ""; $("#company-filter").value = ""; $("#maturity-filter").value = ""; render(); });
+$("#reset-button").addEventListener("click", () => { Object.assign(state, { query: "", company: "", taipowerUnit: "", domain: "" }); $("#search-input").value = ""; $("#company-filter").value = ""; $("#taipower-filter").value = ""; render(); });
 $("#domain-list").addEventListener("click", (event) => { const button = event.target.closest("[data-domain]"); if (button) { state.domain = state.domain === button.dataset.domain ? "" : button.dataset.domain; render(); } });
 $("#case-list").addEventListener("click", (event) => { const card = event.target.closest("[data-number]"); if (card) openCase(card.dataset.number); });
 $("#case-list").addEventListener("keydown", (event) => { if ((event.key === "Enter" || event.key === " ") && event.target.matches("[data-number]")) openCase(event.target.dataset.number); });

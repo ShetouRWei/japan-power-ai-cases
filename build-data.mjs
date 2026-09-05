@@ -4,8 +4,10 @@ import { fileURLToPath } from "node:url";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const sourcePath = resolve(here, "..", "日本電力公司AI案例庫.md");
+const taipowerMappingPath = resolve(here, "..", "台電8加1系統事業部案例對照.md");
 const outputPath = resolve(here, "cases-data.js");
 const markdown = (await readFile(sourcePath, "utf8")).replace(/\r\n/g, "\n");
+const taipowerMappingMarkdown = (await readFile(taipowerMappingPath, "utf8")).replace(/\r\n/g, "\n");
 
 const companyGroups = [
   "北海道電力集團",
@@ -21,6 +23,26 @@ const companyGroups = [
   "JERA集團",
   "J-POWER集團",
 ];
+
+const taipowerUnits = [
+  "數位發展系統",
+  "財會資源系統",
+  "營建工程系統",
+  "策略行政系統",
+  "水火力發電事業部",
+  "核能發電事業部",
+  "輸供電事業部",
+  "配售電事業部",
+  "綜合研究所",
+];
+
+const taipowerMapping = new Map();
+for (const line of taipowerMappingMarkdown.split("\n")) {
+  const cells = line.split("|").slice(1, -1).map((cell) => cell.trim());
+  if (/^\d{3}$/.test(cells[0] || "") && /^JP-/.test(cells[1] || "")) {
+    taipowerMapping.set(cells[1], cells[3] || "");
+  }
+}
 
 const sections = markdown
   .split(/(?=^## 案例\s*\d+[^\n]*$)/gm)
@@ -84,17 +106,22 @@ const cases = sections.map((section) => {
     /\*\*成熟度判定：\*\*\s*([^\n]+)/,
     /\|\s*(?:成熟度判定|成熟度|導入階段)\s*\|\s*([^|\n]+)/,
   ]);
+  const cleanId = stripMarkdown(id);
+  const taipowerUnit = taipowerMapping.get(cleanId) || "";
+  if (!taipowerUnit) throw new Error(`案例 ${number} (${cleanId}) 缺少台電系統／事業部對照`);
+  if (!taipowerUnits.includes(taipowerUnit)) throw new Error(`案例 ${number} 的台電系統／事業部無效：${taipowerUnit}`);
   const summaryBlock = section.match(/###\s*案例摘要\s*\n+([\s\S]*?)(?=\n###\s|$)/);
   const summary = stripMarkdown(summaryBlock?.[1] || section.split("\n").slice(1, 8).join(" ")).slice(0, 240);
 
   return {
     number,
     title,
-    id: stripMarkdown(id),
+    id: cleanId,
     company,
     companyDetail: stripMarkdown(companyDetail),
     domain: stripMarkdown(domain),
     maturity: stripMarkdown(maturity),
+    taipowerUnit,
     summary,
     markdown: section.trim(),
   };
@@ -104,6 +131,7 @@ const payload = `window.CASE_LIBRARY = ${JSON.stringify({
   generatedAt: new Date().toISOString(),
   source: "日本電力公司AI案例庫.md",
   companyGroups,
+  taipowerUnits,
   cases,
 })};\n`;
 
