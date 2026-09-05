@@ -20,11 +20,12 @@ h1 { max-width: 720px; margin: 0; font-size: clamp(2.25rem, 6vw, 4.7rem); line-h
 .hero__copy { max-width: 680px; margin: 20px 0 32px; color: #d9eee8; font-size: 1.06rem; }
 .hero__copy span { display: block; }
 .hero__copy span + span { margin-top: 8px; font-size: .88rem; color: #b9d5cd; }
-.stats { display: flex; flex-wrap: wrap; gap: 24px 36px; }
+.stats { display: flex; flex-wrap: wrap; align-items: baseline; gap: 24px 36px; }
 .stats div { display: flex; align-items: baseline; gap: 8px; }
 .stats strong { font-size: 1.8rem; }
 .stats span { color: #c9ddd8; font-size: .82rem; }
 .stats .stats__meta strong { font-size: 1.05rem; }
+.stats .stats__version { margin-left: auto; }
 .stats .stats__updated { flex-basis: auto; }
 .layout { width: min(1180px, calc(100% - 40px)); margin: 0 auto 80px; }
 .toolbar { position: sticky; z-index: 10; top: 0; margin: -22px 0 36px; padding: 16px; border: 1px solid rgba(255,255,255,.7); border-radius: 18px; background: rgba(255,255,255,.92); box-shadow: var(--shadow); backdrop-filter: blur(14px); }
@@ -63,4 +64,4 @@ dialog::backdrop { background: rgba(5, 26, 22, .66); backdrop-filter: blur(4px);
 .case-detail a { color: var(--green-2); overflow-wrap: anywhere; }
 .case-detail code { padding: 2px 5px; border-radius: 5px; background: #edf2ee; }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
-@media (max-width: 620px) { .hero__inner, .layout { width: min(100% - 24px, 1180px); } .hero__inner { padding-top: 44px; } .stats { gap: 18px; } .stats div { display: block; } .stats span { display: block; } .case-list { grid-template-columns: 1fr; } .toolbar { top: 6px; } .filters label { width: 100%; justify-content: space-between; } .filters select { flex: 1; } .button { width: 100%; margin: 0; } }
+@media (max-width: 620px) { .hero__inner, .layout { width: min(100% - 24px, 1180px); } .hero__inner { padding-top: 44px; } .stats { gap: 18px; } .stats div { display: block; } .stats .stats__version { margin-left: 0; } .stats span { display: block; } .case-list { grid-template-columns: 1fr; } .toolbar { top: 6px; } .filters label { width: 100%; justify-content: space-between; } .filters select { flex: 1; } .button { width: 100%; margin: 0; } }
