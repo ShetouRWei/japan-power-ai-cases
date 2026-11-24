@@ -6,7 +6,8 @@ const here = dirname(fileURLToPath(import.meta.url));
 const sourcePath = resolve(here, "..", "日本電力公司AI案例庫.md");
 const taipowerMappingPath = resolve(here, "..", "台電8加1系統事業部案例對照.md");
 const outputPath = resolve(here, "cases-data.js");
-const siteVersion = "v1.12";
+const siteVersion = "v1.13";
+const deploymentTypes = ["地端", "雲端", "混合部署", "未揭露"];
 const markdown = (await readFile(sourcePath, "utf8")).replace(/\r\n/g, "\n");
 const taipowerMappingMarkdown = (await readFile(taipowerMappingPath, "utf8")).replace(/\r\n/g, "\n");
 
@@ -108,6 +109,12 @@ const cases = sections.map((section) => {
     /\|\s*(?:成熟度判定|成熟度|導入階段)\s*\|\s*([^|\n]+)/,
   ]);
   const cleanId = stripMarkdown(id);
+  const deployment = firstMatch(section, [/\*\*算力部署：\*\*\s*([^\n]+)/]);
+  const deploymentNote = firstMatch(section, [/\*\*部署判定說明：\*\*\s*([^\n]+)/]);
+  const deploymentSource = firstMatch(section, [/\*\*部署查核來源：\*\*\s*([^\n]+)/]);
+  if (!deploymentTypes.includes(deployment) || !deploymentNote || !deploymentSource) {
+    throw new Error(`案例 ${number} 缺少有效的算力部署判定、說明或來源`);
+  }
   const taipowerUnit = taipowerMapping.get(cleanId) || "";
   if (!taipowerUnit) throw new Error(`案例 ${number} (${cleanId}) 缺少台電系統／事業部對照`);
   if (!taipowerUnits.includes(taipowerUnit)) throw new Error(`案例 ${number} 的台電系統／事業部無效：${taipowerUnit}`);
@@ -122,6 +129,8 @@ const cases = sections.map((section) => {
     companyDetail: stripMarkdown(companyDetail),
     domain: stripMarkdown(domain),
     maturity: stripMarkdown(maturity),
+    deployment,
+    deploymentNote,
     taipowerUnit,
     summary,
     markdown: section.trim(),
@@ -134,6 +143,7 @@ const payload = `window.CASE_LIBRARY = ${JSON.stringify({
   source: "日本電力公司AI案例庫.md",
   companyGroups,
   taipowerUnits,
+  deploymentTypes,
   cases,
 })};\n`;
 

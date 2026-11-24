@@ -1,5 +1,5 @@
 const library = window.CASE_LIBRARY || { cases: [], generatedAt: "", source: "" };
-const state = { query: "", company: "", taipowerUnit: "", sort: "newest" };
+const state = { query: "", company: "", taipowerUnit: "", deployment: "", sort: "newest" };
 const $ = (selector) => document.querySelector(selector);
 
 function escapeHtml(value = "") {
@@ -45,13 +45,14 @@ function renderFilters() {
   $("#company-filter").insertAdjacentHTML("beforeend", companies.map((value) => `<option value="${escapeHtml(value)}">${escapeHtml(value)}</option>`).join(""));
   const taipowerUnits = library.taipowerUnits || [...new Set(library.cases.map((item) => item.taipowerUnit).filter(Boolean))];
   $("#taipower-filter").insertAdjacentHTML("beforeend", taipowerUnits.map((value) => `<option value="${escapeHtml(value)}">${escapeHtml(value)}</option>`).join(""));
+  $("#deployment-filter").insertAdjacentHTML("beforeend", (library.deploymentTypes || []).map((value) => `<option value="${escapeHtml(value)}">${escapeHtml(value)}</option>`).join(""));
 }
 
 function filteredCases() {
   const query = state.query.toLocaleLowerCase("zh-Hant");
   const items = library.cases.filter((item) => {
     const haystack = `${item.title} ${item.id} ${item.company} ${item.taipowerUnit} ${item.domain} ${item.maturity} ${item.summary} ${item.markdown}`.toLocaleLowerCase("zh-Hant");
-    return (!query || haystack.includes(query)) && (!state.company || item.company === state.company) && (!state.taipowerUnit || item.taipowerUnit === state.taipowerUnit);
+    return (!query || haystack.includes(query)) && (!state.company || item.company === state.company) && (!state.taipowerUnit || item.taipowerUnit === state.taipowerUnit) && (!state.deployment || item.deployment === state.deployment);
   });
   return items.sort((a, b) => state.sort === "oldest" ? a.number - b.number : state.sort === "company" ? (a.company || "").localeCompare(b.company || "", "zh-Hant") : b.number - a.number);
 }
@@ -64,7 +65,7 @@ function render() {
     <span class="case-card__number">CASE ${String(item.number).padStart(3, "0")} ${item.id ? `· ${escapeHtml(item.id)}` : ""}</span>
     <h3>${escapeHtml(item.title.replace(/^案例\s*\d+｜?\s*/, ""))}</h3>
     <p>${escapeHtml(item.summary || "點選查看完整案例內容。")}</p>
-    <div class="card-footer">${item.company ? `<span class="tag">${escapeHtml(item.company)}</span>` : ""}${item.taipowerUnit ? `<span class="tag tag--stage">${escapeHtml(item.taipowerUnit)}</span>` : ""}</div>
+    <div class="card-footer">${item.company ? `<span class="tag">${escapeHtml(item.company)}</span>` : ""}${item.taipowerUnit ? `<span class="tag tag--stage">${escapeHtml(item.taipowerUnit)}</span>` : ""}<span class="tag" title="${escapeHtml(item.deploymentNote)}">算力：${escapeHtml(item.deployment)}</span></div>
   </article>`).join("");
   $("#empty-state").hidden = items.length > 0;
 }
@@ -94,8 +95,9 @@ renderFilters(); render();
 $("#search-input").addEventListener("input", (event) => { state.query = event.target.value.trim(); render(); });
 $("#company-filter").addEventListener("change", (event) => { state.company = event.target.value; render(); });
 $("#taipower-filter").addEventListener("change", (event) => { state.taipowerUnit = event.target.value; render(); });
+$("#deployment-filter").addEventListener("change", (event) => { state.deployment = event.target.value; render(); });
 $("#sort-filter").addEventListener("change", (event) => { state.sort = event.target.value; render(); });
-$("#reset-button").addEventListener("click", () => { Object.assign(state, { query: "", company: "", taipowerUnit: "" }); $("#search-input").value = ""; $("#company-filter").value = ""; $("#taipower-filter").value = ""; render(); });
+$("#reset-button").addEventListener("click", () => { Object.assign(state, { query: "", company: "", taipowerUnit: "", deployment: "" }); $("#search-input").value = ""; $("#company-filter").value = ""; $("#taipower-filter").value = ""; $("#deployment-filter").value = ""; render(); });
 $("#case-list").addEventListener("click", (event) => { const card = event.target.closest("[data-number]"); if (card) openCase(card.dataset.number); });
 $("#case-list").addEventListener("keydown", (event) => { if ((event.key === "Enter" || event.key === " ") && event.target.matches("[data-number]")) openCase(event.target.dataset.number); });
 $("#dialog-close").addEventListener("click", () => $("#case-dialog").close());

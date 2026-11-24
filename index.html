@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="日本電業AI應用案例庫">
   <title>日本電業AI應用案例庫</title>
-  <link rel="stylesheet" href="styles.css?v=20260915-6">
+  <link rel="stylesheet" href="styles.css?v=20261124-1">
 </head>
 <body>
   <header class="hero">
@@ -37,9 +37,11 @@
       <div class="filters">
         <label>公司<select id="company-filter"><option value="">全部公司</option></select></label>
         <label>對應台電系統事業部<select id="taipower-filter"><option value="">全部系統／事業部</option></select></label>
+        <label>算力部署<select id="deployment-filter"><option value="">全部部署方式</option></select></label>
         <label>排序<select id="sort-filter"><option value="newest">最新建檔</option><option value="oldest">最早建檔</option><option value="company">公司名稱</option></select></label>
         <button id="reset-button" class="button" type="button">清除篩選</button>
       </div>
+      <p class="deployment-note">部署判定以各案公開來源為準；部分案例只揭露子系統或資料平台，請見案例內說明。<a href="deployment-audit-2026-11-24.md" target="_blank" rel="noreferrer">查看逐案查核彙整</a></p>
     </section>
 
     <div class="content-grid">
@@ -64,7 +66,7 @@
     <article id="case-detail" class="case-detail"></article>
   </dialog>
 
-  <script src="cases-data.js?v=20260915-6"></script>
-  <script src="app.js?v=20260915-6"></script>
+  <script src="cases-data.js?v=20261124-1"></script>
+  <script src="app.js?v=20261124-1"></script>
 </body>
 </html>

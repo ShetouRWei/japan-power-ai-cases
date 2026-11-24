@@ -35,6 +35,8 @@ h1 { max-width: 720px; margin: 0; font-size: clamp(2.25rem, 6vw, 4.7rem); line-h
 kbd { padding: 3px 8px; border: 1px solid var(--line); border-radius: 6px; color: var(--muted); background: var(--paper); }
 .filters { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--line); }
 .filters label { display: flex; align-items: center; gap: 7px; color: var(--muted); font-size: .8rem; }
+.deployment-note { margin: 12px 0 0; color: var(--muted); font-size: .76rem; line-height: 1.6; }
+.deployment-note a { color: var(--green); }
 select, .button { min-height: 36px; padding: 0 10px; border: 1px solid var(--line); border-radius: 9px; color: var(--ink); background: white; }
 .button { margin-left: auto; cursor: pointer; }
 .content-grid { display: grid; grid-template-columns: minmax(0, 1fr); }
